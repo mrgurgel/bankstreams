@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fraud monitor</title>
+
+    <link rel="stylesheet" type="text/css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly-additions.min.css">
+
+    <style>
+        body {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <img src="images/redhat-logo.png"/>
+    <h2 style="font-weight: bold">Fraud monitor</h2>
+    <br/>
+    <div class="row">
+
+        <table width="100%" id="monitor" role="grid" class="pf-c-table pf-m-grid-md" data-ouia-component-type="PF4/Table" data-ouia-safe="true" >
+            <thead>
+            <tr data-ouia-component-type="PF4/TableRow">
+                <th>Client's name</th>
+                <th>Transaction value</th>
+                <th>Terminal</th>
+                <th>Level</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+
+        </table>
+
+    </div>
+</div>
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    var source = new EventSource("/fraud/stream");
+    source.onmessage = function (event) {
+        console.log(event);
+        let serverResponseJson = JSON.parse(event.data);
+
+        let monitorTable = document.getElementById("monitor");
+        let clientRow = monitorTable.insertRow(1);
+
+        if(serverResponseJson.level == "high") {
+            clientRow.style.backgroundColor = "red";
+        }
+
+        let clientName = clientRow.insertCell(0).innerHTML = serverResponseJson.clientName;
+        let transactionValue = clientRow.insertCell(1).innerHTML = serverResponseJson.value;
+        let terminal = clientRow.insertCell(2).innerHTML = serverResponseJson.terminal;
+        let level = clientRow.insertCell(3).innerHTML = serverResponseJson.level;
+
+    };
+</script>
+</html>
